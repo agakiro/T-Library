@@ -1,18 +1,17 @@
 
-
-
 fun main(){
-    val book1: Library = Book(90743, true, "Маугли", 202, "Джозеф Киплинг")
-    val book2: Library = Book(7, true, "Алхимик", 223, "Пауло Коэльо")
-    val newspaper1: Library = Newspaper(17245, true, "Сельская жизнь", 794)
-    val newspaper2: Library = Newspaper(4, true, "Комсомольская правда", 52)
-    val disc1: Library = Disc(5, true, "Дэдпул и Росомаха", "DVD")
-    val disc2: Library = Disc(111, true, "Bizkit", "CD")
 
-
+    val book1: Book = Book(90743, true, "Маугли", 202, "Джозеф Киплинг")
+    val book2: Book = Book(7, true, "Алхимик", 223, "Пауло Коэльо")
+    val newspaper1: Newspaper = Newspaper(17245, true, "Сельская жизнь", 794, "Апрель")
+    val newspaper2: Newspaper = Newspaper(4, true, "Комсомольская правда", 52, "Март")
+    val disc1: Disc = Disc(5, true, "Дэдпул и Росомаха", "DVD")
+    val disc2: Disc = Disc(111, true, "Bizkit", "CD")
     val action = Action()
-    val libraryItems = listOf(book1, book2, newspaper1, newspaper2, disc1, disc2)
-
+    val digitizer1 = Digitizer()
+    val digitizedBook1: Disc = digitizer1.digitize(book2)
+    val libraryItems = mutableListOf(book1, book2, newspaper1, newspaper2, disc1, disc2, digitizedBook1)
+    val bookList = toType<Library, Book>(libraryItems)
 
     while (true) {
         println("""
@@ -20,182 +19,79 @@ fun main(){
         1 - Показать книги
         2 - Показать газеты
         3 - Показать диски
+        4 - Управление менеджером
         0 - Выйти
-    """.trimIndent())
+        """.trimIndent())
         when (readln()) {
             "1" -> action.showBooks(libraryItems)
             "2" -> action.showNewspapers(libraryItems)
             "3" -> action.showDiscs(libraryItems)
+            "4" -> action.manageManager()
             "0" -> break
             else -> println("Ошибка ввода, повторите попытку")
         }
     }
-
 }
 
-
-class Action {
-
-    fun showBooks(arr: List<Library>) {
-        do {
-            println("*Отображён список книг*")
-            println("Выберите номер объекта")
-            val books = mutableListOf<Book>()
-            for (i in arr) {
-                if (i is Book) {
-                    books.add(i)
-                    println("${books.indexOf(i) + 1} - ${i.getSummaryInformation()}")
-                }
-            }
-            println("0 - Вернуться в меню")
-
-            val indexOfItem = readln()
-            if (!doWith(books, indexOfItem)) {
-                return
-            }
-        } while (indexOfItem != "0")
-    }
-
-
-    fun showNewspapers(arr: List<Library>) {
-        do {
-            println("*Отображён список газет*")
-            println("Выберите номер объекта")
-            val newspapers = mutableListOf<Newspaper>()
-            for (i in arr) {
-                if (i is Newspaper) {
-                    newspapers.add(i)
-                    println("${newspapers.indexOf(i) + 1} - ${i.getSummaryInformation()}")
-
-                }
-            }
-            println("0 - Вернуться в меню")
-
-            val indexOfItem = readln()
-            if (!doWith(newspapers, indexOfItem)) {
-                return
-            }
-        } while (indexOfItem != "0")
-    }
-
-    fun showDiscs (arr: List<Library>) {
-
-        do {
-            println("*Отображён список дисков*")
-            println("Выберите номер объекта:")
-            val discs = mutableListOf<Disc>()
-            for (i in arr) {
-                if (i is Disc) {
-                    discs.add(i)
-                    println("${discs.indexOf(i) + 1} - ${i.getSummaryInformation()}")
-                }
-            }
-            println("0 - Вернуться в меню")
-
-            val indexOfItem = readln()
-            if (!doWith(discs, indexOfItem)) {
-                return
-            }
-        } while (indexOfItem != "0")
-    }
-
-    private fun doWith(itemsList: List<Library>, indexOfItem: String): Boolean {
-        if (indexOfItem == "0") {
-            return true
-        }
-
-        try {
-            indexOfItem.toInt()
-            while (true) {
-                println("Выберите действие:")
-                println("""
-                1 - Взять домой
-                2 - Читать в читальном зале
-                3 - Показать подробную информацию
-                4 - Вернуть
-                0 - Вернуться в меню
-            """.trimIndent()
-                )
-
-                when (readln()) {
-                    "1" -> itemsList[indexOfItem.toInt() - 1].take()
-                    "2" -> itemsList[indexOfItem.toInt() - 1].read()
-                    "3" -> itemsList[indexOfItem.toInt() - 1].getDetailedInformation()
-                    "4" -> itemsList[indexOfItem.toInt() - 1].takeBack()
-                    "0" -> return false
-                    else -> println("Ошибка ввода, повторите попытку")
-                }
-            }
-        } catch (someException: Throwable) {
-            println("Ошибка ввода, повторите попытку")
-        }
-       return true
-    }
-}
-
-
-abstract class Library(val id: Int, var accessibility: Boolean, val name: String): Returnable, Readable, Takeable {
-
+abstract class Library(val id: Int, var isAvailable: Boolean, val name: String): Returnable, Readable, Takeable {
     abstract  fun getDetailedInformation()
 
     fun getSummaryInformation(): String {
-        return "$name доступна: ${if (accessibility) "Да" else "Нет" }"
+        return "$name доступна: ${if (isAvailable) "Да" else "Нет" }"
     }
-
 }
 
-class Book(id: Int, accessibility: Boolean, name: String, private val pages: Int, private val author: String): Library(id, accessibility, name) {
+class Book(id: Int, isAvailable: Boolean, name: String, private val pages: Int, private val author: String): Library(id, isAvailable, name) {
     override fun getDetailedInformation() {
-        println("книга: $name ($pages стр.) автора: $author с id: $id доступна: ${if (accessibility) "Да" else "Нет" }")
+        println("книга: $name ($pages стр.) автора: $author с id: $id доступна: ${if (isAvailable) "Да" else "Нет" }")
     }
 
     override fun takeBack() {
-        if (!accessibility) {
+        if (!isAvailable) {
             println("Книгу $id вернули в библиотеку")
-            accessibility = true
+            isAvailable = true
         } else {
             println("Действие невозможно, объект присутствует в библиотеке")
         }
     }
 
     override fun read() {
-        if (accessibility){
+        if (isAvailable){
             println("Книгу $id взяли в читальный зал")
-            accessibility = false
+            isAvailable = false
         } else {
             println("Действие невозможно, объект недоступен")
         }
     }
 
     override fun take() {
-        if (accessibility){
+        if (isAvailable){
             println("Книгу $id взяли домой")
-            accessibility = false
+            isAvailable = false
         } else {
             println("Действие невозможно, объект недоступен")
         }
     }
 }
 
-
-class Newspaper(id: Int, accessibility: Boolean, name: String, private val releaseNumber: Int) : Library(id, accessibility, name), Readable {
+class Newspaper(id: Int, isAvailable: Boolean, name: String, private val releaseNumber: Int, private val releaseMonth: String) : Library(id, isAvailable, name), Readable {
     override fun getDetailedInformation() {
-        println("выпуск: $releaseNumber газеты $name с id: $id доступен: ${if (accessibility) "Да" else "Нет" }")
+        println("выпуск: $releaseNumber газеты $name, выпущенной в месяце: $releaseMonth с id: $id доступен: ${if (isAvailable) "Да" else "Нет" }")
     }
 
     override fun takeBack() {
-        if (!accessibility) {
+        if (!isAvailable) {
             println("Газету $id вернули в библиотеку")
-            accessibility = true
+            isAvailable = true
         } else {
             println("Действие невозможно, объект присутствует в библиотеке")
         }
     }
 
     override fun read() {
-        if (accessibility){
+        if (isAvailable){
             println("Газету $id взяли в читальный зал")
-            accessibility = false
+            isAvailable = false
         } else {
             println("Действие невозможно, объект недоступен")
         }
@@ -206,16 +102,15 @@ class Newspaper(id: Int, accessibility: Boolean, name: String, private val relea
     }
 }
 
-
-class Disc(id: Int, accessibility: Boolean, name: String, private val type: String) : Library(id, accessibility, name), Takeable {
+class Disc(id: Int, isAvailable: Boolean, name: String, private val type: String) : Library(id, isAvailable, name), Takeable {
     override fun getDetailedInformation() {
-        println("$type $name достуен: ${if (accessibility) "Да" else "Нет" }")
+        println("$type $name достуен: ${if (isAvailable) "Да" else "Нет" }")
     }
 
     override fun takeBack() {
-        if (!accessibility) {
+        if (!isAvailable) {
             println("Диск $id вернули в библиотеку")
-            accessibility = true
+            isAvailable = true
         } else {
             println("Действие невозможно, объект присутствует в библиотеке")
         }
@@ -226,23 +121,11 @@ class Disc(id: Int, accessibility: Boolean, name: String, private val type: Stri
     }
 
     override fun take() {
-        if (accessibility){
+        if (isAvailable){
             println("Диск $id взяли домой")
-            accessibility = false
+            isAvailable = false
         } else {
             println("Действие невозможно, объект недоступен")
         }
     }
-}
-
-interface Readable {
-    fun read()
-}
-
-interface Takeable {
-    fun take()
-}
-
-interface Returnable {
-    fun takeBack()
 }
