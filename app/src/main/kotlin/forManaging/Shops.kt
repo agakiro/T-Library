@@ -1,3 +1,9 @@
+package forManaging
+
+import library.Book
+import library.Disc
+import library.Newspaper
+
 interface Shops<T> {
     fun sell(): T
 }

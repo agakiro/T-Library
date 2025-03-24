@@ -1,3 +1,12 @@
+import forManaging.BookShop
+import forManaging.DiscShop
+import forManaging.Manager
+import forManaging.NewspaperShop
+import library.Book
+import library.Disc
+import library.Library
+import library.Newspaper
+
 class Action {
     fun showBooks(arr: List<Library>) {
         do {

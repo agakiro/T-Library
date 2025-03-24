@@ -1,3 +1,5 @@
+package library
+
 interface Readable {
     fun read()
 }
