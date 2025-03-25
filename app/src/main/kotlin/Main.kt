@@ -1,14 +1,24 @@
+import extraFunction.Digitizer
+import extraFunction.toType
+import library.Book
+import library.Library
+import library.LibraryItemsCreator
+
+
 fun main(){
-    val book1: Book = Book(90743, true, "Маугли", 202, "Джозеф Киплинг")
-    val book2: Book = Book(7, true, "Алхимик", 223, "Пауло Коэльо")
-    val newspaper1: Newspaper = Newspaper(17245, true, "Сельская жизнь", 794, "Апрель")
-    val newspaper2: Newspaper = Newspaper(4, true, "Комсомольская правда", 52, "Март")
-    val disc1: Disc = Disc(5, true, "Дэдпул и Росомаха", "DVD")
-    val disc2: Disc = Disc(111, true, "Bizkit", "CD")
     val action = Action()
     val digitizer1 = Digitizer()
-    val digitizedBook1: Disc = digitizer1.digitize(book2)
-    val libraryItems = mutableListOf(book1, book2, newspaper1, newspaper2, disc1, disc2, digitizedBook1)
+    val itemsCreator = LibraryItemsCreator()
+
+    val libraryItems = mutableListOf(
+        itemsCreator.createBook(90743, true, "Маугли", 202, "Джозеф Киплинг"),
+        itemsCreator.createBook(7, true, "Алхимик", 223, "Пауло Коэльо"),
+        itemsCreator.createNewspaper(17245, true, "Сельская жизнь", 794, "Апрель"),
+        itemsCreator.createNewspaper(4, true, "Комсомольская правда", 52, "Март"),
+        itemsCreator.createDisc(5, true, "Дэдпул и Росомаха", "DVD"),
+        itemsCreator.createDisc(111, true, "Bizkit", "CD"),
+        digitizer1.digitize(itemsCreator.createBook(7, true, "Алхимик", 223, "Пауло Коэльо"))
+    )
     val bookList = toType<Library, Book>(libraryItems)
 
     while (true) {
