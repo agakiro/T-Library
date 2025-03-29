@@ -1,6 +1,8 @@
 package library
 
-class Book(id: Int, isAvailable: Boolean, name: String, private val pages: Int, private val author: String): Library(id, isAvailable, name) {
+import com.example.library.R
+
+data class Book(override val imageId: Int, override val id: Int, override var isAvailable: Boolean, override val name: String, private val pages: Int, private val author: String): Library(id, isAvailable, name, imageId) {
     override fun getDetailedInformation() {
         println("книга: $name ($pages стр.) автора: $author с id: $id доступна: ${if (isAvailable) "Да" else "Нет" }")
     }
