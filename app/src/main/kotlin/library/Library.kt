@@ -1,6 +1,6 @@
 package library
 
-abstract class Library(val id: Int, var isAvailable: Boolean, val name: String): Returnable,
+abstract class Library(open val id: Int, open var isAvailable: Boolean, open val name: String, open val imageId: Int): Returnable,
     Readable, Takeable {
     abstract  fun getDetailedInformation()
 

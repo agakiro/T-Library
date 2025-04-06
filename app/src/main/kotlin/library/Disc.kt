@@ -1,6 +1,8 @@
 package library
 
-class Disc(id: Int, isAvailable: Boolean, name: String, private val type: String) : Library(id, isAvailable, name),
+import com.example.library.R
+
+data class Disc(override val imageId: Int, override val id: Int, override var isAvailable: Boolean, override val name: String, private val type: String) : Library(id, isAvailable, name, imageId),
     Takeable {
     override fun getDetailedInformation() {
         println("$type $name достуен: ${if (isAvailable) "Да" else "Нет" }")
