@@ -1,13 +1,12 @@
 package activity
 
-import android.content.Context
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.library.databinding.LibraryItemBinding
 import library.Library
 
 
-class ItemViewHolder(private val binding: LibraryItemBinding, private val context: Context): RecyclerView.ViewHolder(binding.root) {
+class ItemViewHolder(private val binding: LibraryItemBinding): RecyclerView.ViewHolder(binding.root) {
+
 
     fun bind(libraryItem: Library) = with(binding) {
         itemIcon.setImageResource(libraryItem.imageId)
@@ -16,13 +15,6 @@ class ItemViewHolder(private val binding: LibraryItemBinding, private val contex
         itemId.text = "id: ${libraryItem.id}"
         itemId.alpha = changeAlpha(libraryItem)
         itemCard.elevation = changeElevation(libraryItem)
-        itemCard.setOnClickListener() {
-            Toast.makeText(context, "Элемент с id ${libraryItem.id}", Toast.LENGTH_SHORT).show()
-            libraryItem.isAvailable = !libraryItem.isAvailable
-            itemCard.elevation = changeElevation(libraryItem)
-            itemName.alpha = changeAlpha(libraryItem)
-            itemId.alpha = changeAlpha(libraryItem)
-        }
     }
 
     private fun changeElevation (libraryItem: Library): Float {

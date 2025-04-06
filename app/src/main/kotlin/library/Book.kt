@@ -2,9 +2,9 @@ package library
 
 import com.example.library.R
 
-data class Book(override val imageId: Int, override val id: Int, override var isAvailable: Boolean, override val name: String, private val pages: Int, private val author: String): Library(id, isAvailable, name, imageId) {
-    override fun getDetailedInformation() {
-        println("книга: $name ($pages стр.) автора: $author с id: $id доступна: ${if (isAvailable) "Да" else "Нет" }")
+data class Book(override val imageId: Int, override val id: Int, override var isAvailable: Boolean, override val name: String, val pages: Int, val author: String): Library(id, isAvailable, name, imageId) {
+    override fun getDetailedInformation(): String {
+        return ("Книга: $name ($pages стр.)\nАвтор: $author\nid: $id\nДоступна: ${if (isAvailable) "Да" else "Нет" }")
     }
 
     override fun takeBack() {

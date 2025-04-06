@@ -2,5 +2,7 @@
     <string name="app_name">Library</string>
     <string name="itemname">ItemName</string>
     <string name="itemid">ItemID</string>
+    <string name="somebook">SomeBook</string>
+    <string name="saveButtonText">Сохранить</string>
 </resources>
 

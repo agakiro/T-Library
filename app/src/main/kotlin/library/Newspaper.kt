@@ -2,10 +2,10 @@ package library
 
 import com.example.library.R
 
-data class Newspaper(override val imageId: Int, override val id: Int, override var isAvailable: Boolean, override val name: String, private val releaseNumber: Int, private val releaseMonth: String) : Library(id, isAvailable, name, imageId),
+data class Newspaper(override val imageId: Int, override val id: Int, override var isAvailable: Boolean, override val name: String, val releaseNumber: Int, val releaseMonth: String) : Library(id, isAvailable, name, imageId),
     Readable {
-    override fun getDetailedInformation() {
-        println("выпуск: $releaseNumber газеты $name, выпущенной в месяце: $releaseMonth с id: $id доступен: ${if (isAvailable) "Да" else "Нет" }")
+    override fun getDetailedInformation(): String {
+        return "Газета $name\nВыпуск: $releaseNumber\nМесяц выпуска: $releaseMonth\nid: $id\nДоступна: ${if (isAvailable) "Да" else "Нет" }"
     }
 
     override fun takeBack() {
