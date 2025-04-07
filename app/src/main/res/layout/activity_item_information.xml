@@ -65,7 +65,7 @@
         app:layout_constraintStart_toStartOf="@+id/nameEditText"
         app:layout_constraintTop_toBottomOf="@+id/nameEditText"
         tools:ignore="LabelFor"
-        tools:text="-1" />
+        tools:text="ID" />
 
     <EditText
         android:id="@+id/isAvailableTextText"
@@ -83,7 +83,7 @@
         app:layout_constraintStart_toStartOf="@+id/idEditText"
         app:layout_constraintTop_toBottomOf="@+id/idEditText"
         tools:ignore="LabelFor"
-        tools:text="false" />
+        tools:text="IsAvailable" />
 
     <EditText
         android:id="@+id/extraEditText1"
