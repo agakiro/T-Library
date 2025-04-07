@@ -158,13 +158,13 @@ class ItemInformationActivity : AppCompatActivity() {
     private fun resultSetting (resultIntent: Intent) {
         with (binding) {
             if (intent.getStringExtra(ITEM_TYPE) != "Disc") {
-                if (idEditText.text.toString() == "" || nameEditText.text.toString() == "" || isAvailableTextText.text.toString() == "" || extraEditText1.text.toString() == "" || extraEditText2.text.toString() == "") {
+                if (idEditText.text.isEmpty() || nameEditText.text.isEmpty() || isAvailableTextText.text.isEmpty() || extraEditText1.text.isEmpty() || extraEditText2.text.isEmpty()) {
                     setResult(RESULT_CANCELED, resultIntent)
                 } else {
                     setResult(RESULT_OK, resultIntent)
                 }
             } else {
-                if (idEditText.text.toString() == "" || nameEditText.text.toString() == "" || isAvailableTextText.text.toString() == "" || extraEditText1.text.toString() == "") {
+                if (idEditText.text.isEmpty() || nameEditText.text.isEmpty() || isAvailableTextText.text.isEmpty() || extraEditText1.text.isEmpty()) {
                     setResult(RESULT_CANCELED, resultIntent)
                 } else {
                     setResult(RESULT_OK, resultIntent)
