@@ -2,5 +2,8 @@
     <string name="app_name">Library</string>
     <string name="itemname">ItemName</string>
     <string name="itemid">ItemID</string>
+    <string name="somebook">SomeBook</string>
+    <string name="saveButtonText">Сохранить</string>
+    <string name="add_new_item">Add new item</string>
 </resources>
 

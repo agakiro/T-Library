@@ -2,10 +2,10 @@ package library
 
 import com.example.library.R
 
-data class Disc(override val imageId: Int, override val id: Int, override var isAvailable: Boolean, override val name: String, private val type: String) : Library(id, isAvailable, name, imageId),
+data class Disc(override val imageId: Int, override val id: Int, override var isAvailable: Boolean, override val name: String, val type: String) : Library(id, isAvailable, name, imageId),
     Takeable {
-    override fun getDetailedInformation() {
-        println("$type $name достуен: ${if (isAvailable) "Да" else "Нет" }")
+    override fun getDetailedInformation(): String {
+        return "$type $name\nДостуен: ${if (isAvailable) "Да" else "Нет" }"
     }
 
     override fun takeBack() {
