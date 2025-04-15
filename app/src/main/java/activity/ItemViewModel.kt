@@ -26,6 +26,10 @@ class ItemViewModel :ViewModel() {
     private val _scrollPosition = MutableLiveData<Int>(0)
     val scrollPosition: LiveData<Int> = _scrollPosition
 
+    private val _informationFragmentVisibility = MutableLiveData<Boolean>()
+    val informationFragmentVisibility: LiveData<Boolean> = _informationFragmentVisibility
+
+
     init {
         val generator = LibraryItemsCreator()
         _libraryItems.value = listOf(
@@ -46,6 +50,10 @@ class ItemViewModel :ViewModel() {
         _scrollPosition.value = currentItems.size - 1
     }
 
+    fun makeInformationInvisible() {
+        _informationFragmentVisibility.value = false
+    }
+
     fun saveScrollPosition(position: Int) {
         _scrollPosition.value = position
     }
@@ -57,6 +65,7 @@ class ItemViewModel :ViewModel() {
     fun selectItem(item: Library) {
         _selectedItem.value = item
         _isAddingNewItem.value = false
+        _informationFragmentVisibility.value = true
     }
 
     fun selectNewItemTypeBook() {
@@ -74,6 +83,7 @@ class ItemViewModel :ViewModel() {
     fun startAddingNewItem() {
         _selectedItem.value = null
         _isAddingNewItem.value = true
+        _informationFragmentVisibility.value = true
     }
 
 }

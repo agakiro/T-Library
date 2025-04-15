@@ -5,11 +5,14 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.MenuInflater
+import android.view.View
 import android.widget.PopupMenu
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.library.databinding.ActivityMainBinding
 import library.LibraryItemsCreator
@@ -27,34 +30,27 @@ class MainActivity : AppCompatActivity() {
     }
     private val viewModel: ItemViewModel by viewModels()
     private var isPortrait = true
+    private lateinit var backCallback: OnBackPressedCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(binding.root)
 
-        isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-
         setFragment()
         observeViewModel()
+
+        backCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                viewModel.makeInformationInvisible()
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, backCallback)
+
+        isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     }
 
     private fun setFragment() {
-        if (isPortrait) {
-            setPortrait()
-        } else {
-            setLandscape()
-        }
-    }
-
-    private fun setPortrait() {
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragment_container, ItemListFragment())
-            .commit()
-    }
-
-    private fun setLandscape() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, ItemListFragment())
@@ -64,6 +60,28 @@ class MainActivity : AppCompatActivity() {
     private fun observeViewModel() {
         viewModel.selectedItem.observe(this) { item ->
             item?.let { showInformationFragment(it) }
+        }
+
+        viewModel.informationFragmentVisibility.observe(this) {visibility ->
+            if (visibility == false) {
+                if (isPortrait) {
+                    if (supportFragmentManager.backStackEntryCount > 0) {
+                        supportFragmentManager.popBackStack()
+                    } else {
+                        finish()
+                    }
+                } else {
+                    if (binding.informationFragmentContainer?.isVisible == true) {
+                        binding.informationFragmentContainer!!.visibility = View.INVISIBLE
+                    } else {
+                        finish()
+                    }
+                }
+            } else {
+                if (binding.informationFragmentContainer?.isVisible == false) {
+                    binding.informationFragmentContainer!!.visibility = View.VISIBLE
+                }
+            }
         }
 
         viewModel.isAddingNewItem.observe(this) { isAdding ->

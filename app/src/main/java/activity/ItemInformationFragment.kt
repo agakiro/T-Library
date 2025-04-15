@@ -1,11 +1,13 @@
 package activity
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity.RESULT_CANCELED
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.core.view.isGone
@@ -28,6 +30,7 @@ class ItemInformationFragment : Fragment() {
     private lateinit var binding: FragmentItemInformationBinding
     private var isNew = true
     private var item: Library? = null
+    private lateinit var argItemType: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,34 +45,9 @@ class ItemInformationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         arguments?.let {
             isNew = it.getBoolean(ARG_ITEM_IS_NEW)
-            if(it.getString(ARG_ITEM_TYPE) == "Disc") binding.extraEditText2.isGone = true
+            binding.extraEditText2.isGone = it.getString(ARG_ITEM_TYPE) == "Disc"
             if (!isNew) {
-                item = when (it.getString(ARG_ITEM_TYPE)) {
-                    "Book" -> Book(
-                        it.getInt(ARG_ITEM_PIC),
-                        it.getInt(ARG_ITEM_ID),
-                        it.getBoolean(ARG_ITEM_IS_AVAILABLE),
-                        it.getString(ARG_ITEM_NAME)!!,
-                        it.getInt(ARG_BOOK_PAGES),
-                        it.getString(ARG_BOOK_AUTHOR)!!
-                    )
-                    "Newspaper" -> Newspaper(
-                        it.getInt(ARG_ITEM_PIC),
-                        it.getInt(ARG_ITEM_ID),
-                        it.getBoolean(ARG_ITEM_IS_AVAILABLE),
-                        it.getString(ARG_ITEM_NAME)!!,
-                        it.getInt(ARG_NEWSPAPER_RELEASE),
-                        it.getString(ARG_NEWSPAPER_MONTH)!!
-                    )
-                    "Disc" -> Disc(
-                        it.getInt(ARG_ITEM_PIC),
-                        it.getInt(ARG_ITEM_ID),
-                        it.getBoolean(ARG_ITEM_IS_AVAILABLE),
-                        it.getString(ARG_ITEM_NAME)!!,
-                        it.getString(ARG_DISC_TYPE)!!
-                    )
-                    else -> throw IllegalArgumentException("Неизвестный тип данных")
-                }
+                item = createExistingItem()
             }
         }
 
@@ -80,12 +58,49 @@ class ItemInformationFragment : Fragment() {
         }
     }
 
+    private fun createExistingItem(): Library? {
+        arguments?.let {
+            val itemPic = it.getInt(ARG_ITEM_PIC)
+            val itemId = it.getInt(ARG_ITEM_ID)
+            val itemIsAvailable = it.getBoolean(ARG_ITEM_IS_AVAILABLE)
+            val itemName = it.getString(ARG_ITEM_NAME)!!
+            return when (it.getString(ARG_ITEM_TYPE)) {
+                "Book" -> Book(
+                    itemPic,
+                    itemId,
+                    itemIsAvailable,
+                    itemName,
+                    it.getInt(ARG_BOOK_PAGES),
+                    it.getString(ARG_BOOK_AUTHOR)!!
+                )
+                "Newspaper" -> Newspaper(
+                    itemPic,
+                    itemId,
+                    itemIsAvailable,
+                    itemName,
+                    it.getInt(ARG_NEWSPAPER_RELEASE),
+                    it.getString(ARG_NEWSPAPER_MONTH)!!
+                )
+                "Disc" -> Disc(
+                    itemPic,
+                    itemId,
+                    itemIsAvailable,
+                    itemName,
+                    it.getString(ARG_DISC_TYPE)!!
+                )
+                else -> throw IllegalArgumentException("Неизвестный тип данных")
+            }
+        }
+        return null
+    }
+
     private fun createNewItem() {
+        argItemType = arguments?.getString(ARG_ITEM_TYPE)!!
         with(binding) {
             idEditText.hint = ID_HINT
             isAvailableTextText.hint = IS_AVAILABLE_HINT
             nameEditText.hint = NAME_HINT
-            when (arguments?.getString(ARG_ITEM_TYPE)) {
+            when (argItemType) {
                 "Book" -> {
                     itemPic.setImageResource(R.drawable.book)
                     infoItemName.text = BOOK_INFO_NAME
@@ -107,7 +122,7 @@ class ItemInformationFragment : Fragment() {
                 }
             }
             saveButton.setOnClickListener {
-                val resultItem = when (arguments?.getString(ARG_ITEM_TYPE)) {
+                val resultItem = when (argItemType) {
                     "Book" -> Book(
                         R.drawable.book,
                         idEditText.text.toString().toIntOrNull() ?: EMPTY_ED_DEFAULT_VALUE,
@@ -135,24 +150,48 @@ class ItemInformationFragment : Fragment() {
                     )
                     else -> throw IllegalArgumentException("Неизвестный тип данных")
                 }
-                if (arguments?.getString(ARG_ITEM_TYPE) != "Disc") {
-                    if (idEditText.text.isEmpty() || nameEditText.text.isEmpty() || isAvailableTextText.text.isEmpty() || extraEditText1.text.isEmpty() || extraEditText2.text.isEmpty()) {
-                        viewModel.closeFragment()
+                if (argItemType != "Disc") {
+                    if (isNotDiscInfoEmpty()) {
+                        confirmationForSaveCancel()
                     } else {
-                        viewModel.closeFragment()
                         viewModel.addItem(resultItem)
+                        viewModel.closeFragment()
                     }
                 } else {
-                    if (idEditText.text.isEmpty() || nameEditText.text.isEmpty() || isAvailableTextText.text.isEmpty() || extraEditText1.text.isEmpty()) {
-                        viewModel.closeFragment()
+                    if (isDiscInfoEmpty()) {
+                        confirmationForSaveCancel()
                     } else {
-                        viewModel.closeFragment()
                         viewModel.addItem(resultItem)
-
+                        viewModel.closeFragment()
                     }
                 }
             }
         }
+    }
+
+    private fun isNotDiscInfoEmpty(): Boolean {
+        with(binding) {
+            return (idEditText.text.isEmpty() || nameEditText.text.isEmpty() || isAvailableTextText.text.isEmpty() || extraEditText1.text.isEmpty() || extraEditText2.text.isEmpty())
+        }
+    }
+
+    private fun isDiscInfoEmpty(): Boolean {
+        with(binding) {
+            return idEditText.text.isEmpty() || nameEditText.text.isEmpty() || isAvailableTextText.text.isEmpty() || extraEditText1.text.isEmpty()
+        }
+    }
+
+    private fun confirmationForSaveCancel() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Отменить создание?")
+            .setMessage("Не все поля заполнены, вы уверены, что хотите отменить создание нового элемента?")
+            .setPositiveButton("Да") {_, _ ->
+                viewModel.makeInformationInvisible()
+            }
+            .setNegativeButton("Нет") { _, _ ->
+                createNewItem()
+            }
+            .show()
     }
 
     @SuppressLint("SetTextI18n")
