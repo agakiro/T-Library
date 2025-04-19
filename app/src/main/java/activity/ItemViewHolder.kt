@@ -1,5 +1,6 @@
 package activity
 
+import android.annotation.SuppressLint
 import androidx.recyclerview.widget.RecyclerView
 import com.example.library.databinding.LibraryItemBinding
 import library.Library
@@ -8,6 +9,7 @@ import library.Library
 class ItemViewHolder(private val binding: LibraryItemBinding): RecyclerView.ViewHolder(binding.root) {
 
 
+    @SuppressLint("SetTextI18n")
     fun bind(libraryItem: Library) = with(binding) {
         itemIcon.setImageResource(libraryItem.imageId)
         itemName.text = "Название: ${libraryItem.name}"

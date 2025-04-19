@@ -5,5 +5,7 @@
     <string name="somebook">SomeBook</string>
     <string name="saveButtonText">Сохранить</string>
     <string name="add_new_item">Add new item</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
 
