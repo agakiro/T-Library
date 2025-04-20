@@ -27,9 +27,7 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
         setContentView(binding.root)
 
-        lifecycleScope.launch {
-            setFragment()
-        }
+        setFragment()
         observeViewModel()
         setShimmer()
 
