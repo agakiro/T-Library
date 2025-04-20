@@ -42,10 +42,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setFragment() {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragment_container, ItemListFragment())
-                .commit()
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_container, ItemListFragment())
+            .commit()
     }
 
     private fun setShimmer() {

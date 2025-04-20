@@ -20,6 +20,9 @@ class ItemViewModel :ViewModel() {
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _isUpdating = MutableStateFlow(true)
+    val isUpdating: StateFlow<Boolean> = _isUpdating
+
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
@@ -51,13 +54,9 @@ class ItemViewModel :ViewModel() {
             _isLoading.value = true
             _error.value = null
 
-            try {
+            runCatching {
                 delay(Random.nextLong(100, 2000))
-
-                if (Random.nextInt(4) == 0) {
-                    throw Exception("Ошибка загрузки данных")
-                }
-
+                if (Random.nextInt(4) == 0) throw Exception(LOADING_ERROR)
                 val generator = LibraryItemsCreator()
                 _libraryItems.value = listOf(
                     generator.createBook(90743, true, "Маугли", 202, "Джозеф Киплинг"),
@@ -67,34 +66,28 @@ class ItemViewModel :ViewModel() {
                     generator.createBook(7, true, "Алхимик", 223, "Пауло Коэльо"),
                     generator.createDisc(111, true, "Bizkit", "CD")
                 )
-            } catch (e: Exception) {
-                _error.value = e.message ?: "Неизвестная ошибка"
-            } finally {
-                _isLoading.value = false
             }
+                .onFailure { e -> _error.value = e.message ?: UNKNOWN_ERROR }
+
+            _isLoading.value = false
         }
     }
 
     fun addItem(newItem: Library) {
         val currentItems = _libraryItems.value.toMutableList()
         viewModelScope.launch {
-            _isLoading.value = true
+            _isUpdating.value = true
             _error.value = null
 
-            try {
-                delay(Random.nextLong(100, 500))
-
-                if (Random.nextInt(4) == 0) {
-                    throw Exception("Ошибка сохранения данных")
-                }
+            runCatching {
+                delay(Random.nextLong(100, 1000))
+                if (Random.nextInt(4) == 0) throw Exception(SAVING_ERROR)
                 currentItems.add(newItem)
-                _libraryItems.value = currentItems
-            } catch (e: Exception) {
-                _error.value = e.message ?: "Неизвестная ошибка"
-            } finally {
-                _isLoading.value = false
-                _isAddingNewItem.value = false
             }
+                .onSuccess { _libraryItems.value = currentItems }
+                .onFailure { e ->  _error.value = e.message ?: UNKNOWN_ERROR }
+            _isUpdating.value = false
+            _isAddingNewItem.value = false
         }
         _scrollPosition.value = currentItems.size - 1
         _isAddingNewItem.value = false
@@ -134,6 +127,12 @@ class ItemViewModel :ViewModel() {
         _selectedItem.value = null
         _isAddingNewItem.value = true
         _informationFragmentVisibility.value = true
+    }
+
+    companion object {
+        private const val LOADING_ERROR = "Ошибка загрузки данных"
+        private const val SAVING_ERROR = "Ошибка сохранения данных"
+        private const val UNKNOWN_ERROR = "Неизвестная ошибка"
     }
 
 }

@@ -24,7 +24,7 @@
             android:orientation="vertical"
             android:visibility="visible">
 
-            <ImageView
+            <View
                 android:id="@+id/itemIcon"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
@@ -37,10 +37,10 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:background="@color/shimmerColor"/>
 
-            <TextView
+            <View
                 android:id="@+id/itemName"
                 android:layout_width="120dp"
-                android:layout_height="wrap_content"
+                android:layout_height="35dp"
                 android:layout_gravity="center"
                 android:layout_marginHorizontal="8dp"
                 android:layout_marginVertical="2dp"
@@ -51,10 +51,10 @@
                 android:textStyle="bold"
                 android:background="@color/shimmerColor"/>
 
-            <TextView
+            <View
                 android:id="@+id/itemId"
                 android:layout_width="80dp"
-                android:layout_height="wrap_content"
+                android:layout_height="35dp"
                 android:layout_gravity="center"
                 android:layout_marginHorizontal="8dp"
                 android:layout_marginVertical="2dp"
