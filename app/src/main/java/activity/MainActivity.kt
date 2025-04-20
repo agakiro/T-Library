@@ -1,28 +1,18 @@
 package activity
 
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.view.MenuInflater
 import android.view.View
-import android.widget.PopupMenu
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.lifecycle.lifecycleScope
 import com.example.library.databinding.ActivityMainBinding
-import library.LibraryItemsCreator
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.example.library.R
-import library.Book
-import library.Disc
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import library.Library
-import library.Newspaper
 
 class MainActivity : AppCompatActivity() {
     private val binding by lazy {
@@ -37,8 +27,11 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
         setContentView(binding.root)
 
-        setFragment()
+        lifecycleScope.launch {
+            setFragment()
+        }
         observeViewModel()
+        setShimmer()
 
         backCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -51,10 +44,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setFragment() {
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragment_container, ItemListFragment())
-            .commit()
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragment_container, ItemListFragment())
+                .commit()
+    }
+
+    private fun setShimmer() {
+        lifecycleScope.launch {
+            viewModel.isLoading.collect {
+                if (viewModel.isLoading.value) {
+                    binding.shimmerContainer.visibility = View.VISIBLE
+                    binding.shimmerContainer.startShimmer()
+                    delay(2000)
+                } else {
+                    binding.shimmerContainer.stopShimmer()
+                    binding.shimmerContainer.visibility = View.GONE
+                }
+            }
+        }
+
     }
 
     private fun observeViewModel() {
@@ -136,7 +145,9 @@ class MainActivity : AppCompatActivity() {
 
         if (isNewPortrait != isPortrait) {
             isPortrait = isNewPortrait
-            setFragment()
+            lifecycleScope.launch {
+                setFragment()
+            }
             viewModel.selectedItem.value?.let {
                 showInformationFragment(it)
             } ?: viewModel.isAddingNewItem.value?.takeIf { it }?.let {
