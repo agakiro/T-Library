@@ -20,14 +20,11 @@ class ItemViewModel :ViewModel() {
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _isUpdating = MutableStateFlow(false)
+    private val _isUpdating = MutableStateFlow(true)
     val isUpdating: StateFlow<Boolean> = _isUpdating
 
-    private val _error = MutableStateFlow<Throwable?>(null)
-    val error: StateFlow<Throwable?> = _error
-
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
 
     private val _isAddingNewItem = MutableLiveData<Boolean>(false)
     val isAddingNewItem: LiveData<Boolean> = _isAddingNewItem
@@ -59,7 +56,7 @@ class ItemViewModel :ViewModel() {
 
             runCatching {
                 delay(Random.nextLong(100, 2000))
-                if (Random.nextInt(4) == 0) throw ArtificialError.LoadingError(LOADING_ERROR)
+                if (Random.nextInt(4) == 0) throw Exception(LOADING_ERROR)
                 val generator = LibraryItemsCreator()
                 _libraryItems.value = listOf(
                     generator.createBook(90743, true, "Маугли", 202, "Джозеф Киплинг"),
@@ -70,10 +67,7 @@ class ItemViewModel :ViewModel() {
                     generator.createDisc(111, true, "Bizkit", "CD")
                 )
             }
-                .onFailure { e ->
-                    _error.value = e
-                    _errorMessage.value = e.message ?: UNKNOWN_ERROR
-                }
+                .onFailure { e -> _error.value = e.message ?: UNKNOWN_ERROR }
 
             _isLoading.value = false
         }
@@ -87,14 +81,11 @@ class ItemViewModel :ViewModel() {
 
             runCatching {
                 delay(Random.nextLong(100, 1000))
-                if (Random.nextInt(4) == 0) throw ArtificialError.SavingError(SAVING_ERROR)
+                if (Random.nextInt(4) == 0) throw Exception(SAVING_ERROR)
                 currentItems.add(newItem)
             }
                 .onSuccess { _libraryItems.value = currentItems }
-                .onFailure { e ->
-                    _error.value = e
-                    _errorMessage.value = e.message ?: UNKNOWN_ERROR
-                }
+                .onFailure { e ->  _error.value = e.message ?: UNKNOWN_ERROR }
             _isUpdating.value = false
             _isAddingNewItem.value = false
         }
@@ -136,11 +127,6 @@ class ItemViewModel :ViewModel() {
         _selectedItem.value = null
         _isAddingNewItem.value = true
         _informationFragmentVisibility.value = true
-    }
-
-    fun clearErrors() {
-        _error.value = null
-        _errorMessage.value = null
     }
 
     companion object {

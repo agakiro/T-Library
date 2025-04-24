@@ -92,14 +92,13 @@ class ItemListFragment : Fragment(R.layout.fragment_item_list) {
 
     private fun setErrorHandler() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.errorMessage.collect { error ->
+            viewModel.error.collect { error ->
                 error?.let {
                     AlertDialog.Builder(requireContext())
-                        .setTitle(viewModel.errorMessage.value)
+                        .setTitle(viewModel.error.value)
                         .setMessage("Попробуйте ещё раз")
                         .setPositiveButton("ОК") {_, _ ->
-                            if (viewModel.error.value is ArtificialError.LoadingError) viewModel.loadItems()
-                            viewModel.clearErrors()
+                            if (viewModel.error.value == "Ошибка загрузки данных") viewModel.loadItems()
                         }
                         .show()
                 }
