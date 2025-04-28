@@ -1,5 +1,8 @@
 package library
 
+import androidx.room.Entity
+
+@Entity(tableName = "library_items")
 abstract class Library(open val id: Int, open var isAvailable: Boolean, open val name: String, open val imageId: Int): Returnable,
     Readable, Takeable {
     abstract  fun getDetailedInformation(): String
