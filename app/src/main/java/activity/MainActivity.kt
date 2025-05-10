@@ -10,6 +10,9 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.library.databinding.ActivityMainBinding
 import com.example.library.R
+import db.ItemRepository
+import db.LibraryDatabase
+import db.SortSettings
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import library.Library
@@ -18,7 +21,11 @@ class MainActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-    private val viewModel: ItemViewModel by viewModels()
+    private val viewModel: ItemViewModel by viewModels {
+        ItemViewModelFactory(ItemRepository(LibraryDatabase.getDb(this).getDao(),
+            SortSettings(this)
+        ))
+    }
     private var isPortrait = true
     private lateinit var backCallback: OnBackPressedCallback
 

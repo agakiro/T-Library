@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id ("kotlin-kapt")
 }
 
 android {
@@ -37,6 +38,12 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    configurations.all{
+        resolutionStrategy{
+            force("org.jetbrains:annotations:23.0.0")
+        }
+    }
 }
 
 dependencies {
@@ -52,5 +59,8 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.shimmer)
-    implementation (libs.kotlinx.coroutines.android)
+    implementation (libs.jetbrains.kotlinx.coroutines.android)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+
 }

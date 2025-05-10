@@ -11,6 +11,7 @@ import android.widget.PopupMenu
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.library.R
 import com.example.library.databinding.FragmentItemListBinding
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +38,7 @@ class ItemListFragment : Fragment(R.layout.fragment_item_list) {
         setObserver()
         setButton()
         setErrorHandler()
+        setProgressBar()
     }
 
     private fun setButton() {
@@ -68,6 +70,18 @@ class ItemListFragment : Fragment(R.layout.fragment_item_list) {
         }
     }
 
+    private fun setProgressBar() {
+        lifecycleScope.launch {
+            viewModel.isUpdating.collect {isUpdating ->
+                if (isUpdating) {
+                    binding.progressBar.visibility = View.VISIBLE
+                } else {
+                    binding.progressBar.visibility = View.GONE
+                }
+            }
+        }
+    }
+
     private fun setRecyclerView() {
         adapter = ItemAdapter { item ->
             viewModel.selectItem(item)
@@ -76,6 +90,26 @@ class ItemListFragment : Fragment(R.layout.fragment_item_list) {
             rcView.layoutManager = GridLayoutManager(context, 1)
             rcView.adapter = adapter
         }
+
+        binding.rcView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = recyclerView.layoutManager as GridLayoutManager
+                val totalItemCount = layoutManager.itemCount
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+
+                /*if (firstVisibleItemPosition - 10 <= 0) {
+                    viewModel.loadPreviousPage()
+                }*/
+
+                if (lastVisibleItemPosition + 1 >= totalItemCount) {
+                    viewModel.loadNextPage()
+                }
+            }
+        })
+
         viewModel.scrollPosition.observe(viewLifecycleOwner) { position ->
             (binding.rcView.layoutManager as GridLayoutManager)
                 .scrollToPositionWithOffset(position, 0)
@@ -98,9 +132,9 @@ class ItemListFragment : Fragment(R.layout.fragment_item_list) {
                         .setTitle(viewModel.error.value)
                         .setMessage("Попробуйте ещё раз")
                         .setPositiveButton("ОК") {_, _ ->
-                            if (viewModel.error.value == "Ошибка загрузки данных") viewModel.loadItems()
+                            if (viewModel.error.value == "Ошибка загрузки данных") lifecycleScope.launch { viewModel.initializeItems() }
                         }
-                        .show()
+                            .show()
                 }
             }
         }

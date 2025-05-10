@@ -30,6 +30,7 @@
                 <include layout="@layout/library_item_shimmer"/>
                 <include layout="@layout/library_item_shimmer"/>
                 <include layout="@layout/library_item_shimmer"/>
+
             </LinearLayout>
         </com.facebook.shimmer.ShimmerFrameLayout>
     </FrameLayout>
